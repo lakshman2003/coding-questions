@@ -70,40 +70,42 @@ inline ll inv(ll a)
 }
 
 
-void solve(ll n)
+void solve(int k, string a, string b)
 {
-    ll l = 1,r = 1;
-    while(1){
-        ll s = (r*(r+1))/2-(l*(l-1))/2;
-        ll nxtl = r+1,nxtr = r+s;
-        if(n>=nxtl and n<=nxtr){
-            ll lo = l,hi = r,ans = r;
-            while(lo<=hi){
-                ll mid = (lo+hi)>>1;
-                ll s= (mid*(mid+1))/2-(l*(l-1))/2;
-                if(r+s>=n){
-                    ans = mid;
-                    hi = mid-1;
-                }
-                else lo = mid+1;
-            }
-            cout<<ans<<en;
-            break;
+    int n = a.length(), m = b.length();
+    vector<vector<vector<int>>> dp(n+1, vector<vector<int>>(m+1, vector<int>(k+1, -1)));
+    auto rec = [&](auto &self, int lvl, int match, int tot) -> int {
+        if (tot > k) return 1e6;
+        if (lvl == n) return (tot == k) ? 0 : 1e6;
+        if (dp[lvl][match][tot] != -1) return dp[lvl][match][tot];
+        int ans = self(self, lvl + 1, match, tot) + 1;
+        string t = b.substr(0, match) + a[lvl];
+        int new_match = 0;
+        string combined = b + "#" + t;
+        vector<int> z(combined.size(), 0);
+        for (int i = 1, l = 0, r = 0; i < combined.size(); i++) {
+            if (i <= r) z[i] = min(r - i + 1, z[i - l]);
+            while (i + z[i] < combined.size() && combined[z[i]] == combined[i + z[i]]) z[i]++;
+            if (i + z[i] - 1 > r) l = i, r = i + z[i] - 1;
+            if (i > b.size() && z[i] == b.size()) { new_match = b.size(); break; }
+            if (i > b.size()) new_match = max(new_match, z[i]);
         }
-        l = nxtl;
-        r = nxtr;
-    }
-}
+        ans = min(ans, self(self, lvl + 1, new_match, tot + (new_match == m)));
+        return dp[lvl][match][tot] = ans;
+    };
+    int ans = rec(rec, 0, 0, 0);
+    cout << (ans >= 1e6 ? -1 : ans) << en;
+};
 
 signed main(){
     fast
-    ll t;
-    cin>>t;
+    ll t = 1;
     while(t--)
     {
-        ll x;
-        cin>>x;
-        solve(x);
+        int k;
+        string a,b;
+        cin>>k>>a>>b;
+        solve(k,a,b);
     }
     return 0;
 }

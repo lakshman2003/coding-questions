@@ -72,7 +72,25 @@ inline ll inv(ll a)
 
 void solve()
 {
-    
+    ll n,q;
+    cin>>n>>q;
+    vll v(n);
+    getv(v,n);
+    vll pre(n+1,0);
+    fr(i,0,n) pre[v[i]]++;
+    fr(i,1,n+1) pre[i]+= pre[i-1];
+    auto find_med = [&](ll x){
+        ll l = 0, hi = n;
+        vll pre(n+1,0);
+        fr(i,0,)
+        while(lo<=hi){
+            ll mid = (lo+hi)>>1;
+            
+        }
+    }
+    fr(i,1,n+1){
+
+    }
 }
 
 signed main(){

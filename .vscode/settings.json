@@ -35,5 +35,6 @@
         "iosfwd": "cpp",
         "chrono": "cpp"
     },
-    "C_Cpp.errorSquiggles": "enabled"
+    "C_Cpp.errorSquiggles": "enabled",
+    "C_Cpp.default.compilerPath": "/opt/homebrew/bin/gcc-14"
 }
