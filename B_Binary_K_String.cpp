@@ -69,63 +69,26 @@ inline ll inv(ll a)
     return bin_pow(a,mod-2)%mod;
 }
 
-
+const ll maxn = 1e5+10;
+ll dp[maxn];
+ll pre[maxn];
 void solve()
 {
-    ll n,q;
-    cin>>n>>q;
-    v2ll grid(n,vll(n));
-    fr(i,0,n){
-        fr(j,0,n){
-            cin>>grid[i][j];
-        }
+    ll k;
+    cin>>k;
+    dp[0] = 1;
+    pre[0] = 1;
+    fr(i,1,maxn){
+        dp[i]= dp[i-1];
+        if(i>=k) (dp[i]+=dp[i-k])%=mod;
+        (pre[i] = pre[i-1]+dp[i])%=mod;
     }
-    v2ll p1(n,vll(n)),p2(n,vll(n)),p3(n,vll(n));
-    fr(i,0,n){
-        fr(j,0,n){
-            p1[i][j] = grid[i][j];
-            p2[i][j] = grid[i][j]*i;
-            p3[i][j] = grid[i][j]*j;
-            if(i) {
-                p1[i][j] += p1[i-1][j];
-                p2[i][j] += p2[i-1][j];
-                p3[i][j] += p3[i-1][j];
-            }
-            if(j){
-                p1[i][j] += p1[i][j-1];
-                p2[i][j] += p2[i][j-1];
-                p3[i][j] += p3[i][j-1];
-            }
-            if(i and j){
-                p1[i][j] -= p1[i-1][j-1];
-                p2[i][j] -= p2[i-1][j-1];
-                p3[i][j] -= p3[i-1][j-1];
-            }
-        }
-    }
+    ll q;
+    cin>>q;
     while(q--){
-        ll x1,y1,x2,y2;
-        cin>>x1>>y1>>x2>>y2;
-        x1--,y1--,x2--,y2--;
-        ll col = y2-y1+1;
-
-        ll s1 = p1[x2][y2];
-        if(x1) s1 -= p1[x1-1][y2];
-        if(y1) s1 -= p1[x2][y1-1];
-        if(x1 and y1) s1 += p1[x1-1][y1-1];
-
-        ll s2 = p2[x2][y2];
-        if(x1) s2 -= p2[x1-1][y2];
-        if(y1) s2 -= p2[x2][y1-1];
-        if(x1 and y1) s2 += p2[x1-1][y1-1];
-
-        ll s3 = p3[x2][y2];
-        if(x1) s3 -= p3[x1-1][y2];
-        if(y1) s3 -= p3[x2][y1-1];
-        if(x1 and y1) s3 += p3[x1-1][y1-1];
-
-        ll ans = s3+s2*col-(col*x1+y1-1)*s1;
-        cout<<ans<<" ";
+        ll a,b;
+        cin>>a>>b;
+        cout<<(pre[b]-pre[a-1]+mod)%mod<<" ";
     }
     cout<<en;
 }

@@ -11,10 +11,10 @@ tree_order_statistics_node_update> indexed_set;
 #define ll long long
 #define ldd long double
 #define en '\n'
-#define MP make_pair
 #define pb push_back
 #define pii pair<int, int>
 #define pll pair<ll, ll>
+#define MP make_pair
 #define ff first
 #define ss second
 #define vi vector<int>
@@ -34,8 +34,8 @@ tree_order_statistics_node_update> indexed_set;
 #define mod 1000000007
 #define print(v) fr(i,0,v.size()) cout<<v[i]<<" "
 #define INF LLONG_MAX
-#define yes cout<<"YES\n"
-#define no cout<<"NO\n"
+#define yes cout<<"Yes\n"
+#define no cout<<"No\n"
 #define fast ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
 #define stp(n) cout<<fixed<<setprecision(n)
 #define sz(v) 1LL*v.size()
@@ -69,74 +69,50 @@ inline ll inv(ll a)
     return bin_pow(a,mod-2)%mod;
 }
 
-
 void solve()
 {
-    ll n,q;
-    cin>>n>>q;
-    v2ll grid(n,vll(n));
-    fr(i,0,n){
-        fr(j,0,n){
-            cin>>grid[i][j];
+    ll n,k;
+    cin>>n>>k;
+    vll poss2(3*n+1,0),pre2(3*n+1,0);
+    fr(i,2,2*n+1){
+        ll l = max(i-n,1LL),r = min(i-1, n);
+        poss2[i] = (r-l+1);
+    }
+    fr(i,2,3*n+1){
+        pre2[i] = pre2[i-1]+poss2[i];
+    }
+    vll poss3(3*n+1,0),pre3(3*n+1,0);
+    fr(i,3,3*n+1){
+        ll l = max(i-n,2LL),r = min(i-1, 2*n);
+        poss3[i] = pre2[r]-pre2[l-1];
+        pre3[i] = pre3[i-1]+poss3[i];
+    }
+    auto it = lower_bound(all(pre3),k);
+    ll sum = it-pre3.begin();
+    k-=pre3[sum-1];
+    ll lo = 1, hi = n, x1 = 0;
+    while(lo<=hi){
+        ll mid = (lo+hi)/2;
+        ll cnt = pre2[sum-1]-((sum-mid-1>=0)?pre2[sum-mid-1]:0);
+        if(cnt<k){
+            x1 = mid;
+            lo = mid+1;
         }
+        else hi = mid-1;
     }
-    v2ll p1(n,vll(n)),p2(n,vll(n)),p3(n,vll(n));
-    fr(i,0,n){
-        fr(j,0,n){
-            p1[i][j] = grid[i][j];
-            p2[i][j] = grid[i][j]*i;
-            p3[i][j] = grid[i][j]*j;
-            if(i) {
-                p1[i][j] += p1[i-1][j];
-                p2[i][j] += p2[i-1][j];
-                p3[i][j] += p3[i-1][j];
-            }
-            if(j){
-                p1[i][j] += p1[i][j-1];
-                p2[i][j] += p2[i][j-1];
-                p3[i][j] += p3[i][j-1];
-            }
-            if(i and j){
-                p1[i][j] -= p1[i-1][j-1];
-                p2[i][j] -= p2[i-1][j-1];
-                p3[i][j] -= p3[i-1][j-1];
-            }
-        }
+    x1++;
+    if(x1-1>=1){
+        k-= pre2[sum-1]-((sum-x1>=0)?pre2[sum-x1]:0);
     }
-    while(q--){
-        ll x1,y1,x2,y2;
-        cin>>x1>>y1>>x2>>y2;
-        x1--,y1--,x2--,y2--;
-        ll col = y2-y1+1;
-
-        ll s1 = p1[x2][y2];
-        if(x1) s1 -= p1[x1-1][y2];
-        if(y1) s1 -= p1[x2][y1-1];
-        if(x1 and y1) s1 += p1[x1-1][y1-1];
-
-        ll s2 = p2[x2][y2];
-        if(x1) s2 -= p2[x1-1][y2];
-        if(y1) s2 -= p2[x2][y1-1];
-        if(x1 and y1) s2 += p2[x1-1][y1-1];
-
-        ll s3 = p3[x2][y2];
-        if(x1) s3 -= p3[x1-1][y2];
-        if(y1) s3 -= p3[x2][y1-1];
-        if(x1 and y1) s3 += p3[x1-1][y1-1];
-
-        ll ans = s3+s2*col-(col*x1+y1-1)*s1;
-        cout<<ans<<" ";
-    }
-    cout<<en;
+    sum-=x1;
+    ll l = max(sum-n,1LL),r = min(sum-1,n);
+    ll x2 = l+k-1;
+    ll x3= sum-x2;
+    cout<<x1<<" "<<x2<<" "<<x3<<en;
 }
 
 signed main(){
     fast
-    ll t;
-    cin>>t;
-    while(t--)
-    {
-        solve();
-    }
+    solve();
     return 0;
 }

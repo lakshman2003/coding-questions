@@ -69,71 +69,73 @@ inline ll inv(ll a)
     return bin_pow(a,mod-2)%mod;
 }
 
+class Segtree
+{
+    public:
+    ll n;
+    vll v,t;
+    Segtree(ll x = 0)
+    {
+        n = x;
+        t.resize(4*n+1);
+    }
+
+    ll merge(ll x,ll y)
+    {
+        return x+y;
+    }
+
+
+    void update(ll ind,ll l,ll r,ll pos,ll val)
+    {
+        if(l>pos or r<pos) return;
+        if(l==r)
+        {
+            t[ind] = val;
+            return;
+        }
+        ll mid = (l+r)>>1;
+        update(ind<<1,l,mid,pos,val);
+        update(ind<<1|1,mid+1,r,pos,val);
+        t[ind] = merge(t[ind<<1],t[ind<<1|1]);
+    }
+
+    ll query(ll ind,ll l,ll r,ll lq,ll rq)
+    {
+        if(l>rq or r<lq) return 0;
+        if(l>=lq and r<=rq) return t[ind];
+        ll mid = (l+r)>>1;
+        return merge(query(ind<<1,l,mid,lq,rq),query(ind<<1|1,mid+1,r,lq,rq));
+    }
+};
 
 void solve()
 {
-    ll n,q;
-    cin>>n>>q;
-    v2ll grid(n,vll(n));
+    string s;
+    cin>>s;
+    ll n = s.length();
+    vll dp(n,0),last1(26,-1),last2(26,-1);
+    Segtree sg(n);
     fr(i,0,n){
-        fr(j,0,n){
-            cin>>grid[i][j];
-        }
+        auto x = s[i]-'a';
+        if(last[x]==-1) dp[i]++;
+        ll q = sg.query(1,0,n-1,last[x]+1,i-2);
+        dp[i] = add(dp[i],q);
+        if(last[x]!=-1 and last[x]!=i-1) dp[i] = (dp[i]+dp[last[x]])%mod;
+        last[x] = i;
+        sg.update(1,0,n-1,i,dp[i]);
     }
-    v2ll p1(n,vll(n)),p2(n,vll(n)),p3(n,vll(n));
+    ll ans = 0;
     fr(i,0,n){
-        fr(j,0,n){
-            p1[i][j] = grid[i][j];
-            p2[i][j] = grid[i][j]*i;
-            p3[i][j] = grid[i][j]*j;
-            if(i) {
-                p1[i][j] += p1[i-1][j];
-                p2[i][j] += p2[i-1][j];
-                p3[i][j] += p3[i-1][j];
-            }
-            if(j){
-                p1[i][j] += p1[i][j-1];
-                p2[i][j] += p2[i][j-1];
-                p3[i][j] += p3[i][j-1];
-            }
-            if(i and j){
-                p1[i][j] -= p1[i-1][j-1];
-                p2[i][j] -= p2[i-1][j-1];
-                p3[i][j] -= p3[i-1][j-1];
-            }
-        }
+        cout<<dp[i]<<" ";
+        ans = add(ans,dp[i]);
     }
-    while(q--){
-        ll x1,y1,x2,y2;
-        cin>>x1>>y1>>x2>>y2;
-        x1--,y1--,x2--,y2--;
-        ll col = y2-y1+1;
-
-        ll s1 = p1[x2][y2];
-        if(x1) s1 -= p1[x1-1][y2];
-        if(y1) s1 -= p1[x2][y1-1];
-        if(x1 and y1) s1 += p1[x1-1][y1-1];
-
-        ll s2 = p2[x2][y2];
-        if(x1) s2 -= p2[x1-1][y2];
-        if(y1) s2 -= p2[x2][y1-1];
-        if(x1 and y1) s2 += p2[x1-1][y1-1];
-
-        ll s3 = p3[x2][y2];
-        if(x1) s3 -= p3[x1-1][y2];
-        if(y1) s3 -= p3[x2][y1-1];
-        if(x1 and y1) s3 += p3[x1-1][y1-1];
-
-        ll ans = s3+s2*col-(col*x1+y1-1)*s1;
-        cout<<ans<<" ";
-    }
-    cout<<en;
+    cout<<ans<<en;
 }
 
 signed main(){
     fast
-    ll t;
-    cin>>t;
+    ll t = 1;
     while(t--)
     {
         solve();

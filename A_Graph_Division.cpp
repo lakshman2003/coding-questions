@@ -72,62 +72,52 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll n,q;
-    cin>>n>>q;
-    v2ll grid(n,vll(n));
-    fr(i,0,n){
-        fr(j,0,n){
-            cin>>grid[i][j];
+    ll n,m;
+    cin>>n>>m;
+    vector <vector<pll>> g(n);
+    vll from(m),to(m),w(m);
+    getv(from,m);
+    getv(to,m);
+    getv(w,m);
+    fr(i,0,m){
+        from[i]--,to[i]--;
+        g[from[i]].pb({to[i],w[i]});
+        g[to[i]].pb({from[i],w[i]});
+    }
+    ll k;
+    cin>>k;
+    auto check = [&](ll x){
+        vector <bool> vis(n,false);
+        auto dfs = [&](auto &self,ll node)->void{
+            vis[node] = true;
+            for(auto [nei,wei]:g[node]){
+                if(wei<=x and !vis[nei]){
+                    self(self,nei);
+                }
+            }
+        };
+        ll c = 0;
+        fr(i,0,n){
+            if(!vis[i]){
+                c++;
+                dfs(dfs,i);
+            }
+        }
+        return c<=k;
+    };
+    ll lo = 0, hi = 1e12;
+    ll ans = 1e12;
+    while(lo<=hi){
+        ll mid = (lo+hi)/2;
+        if(check(mid)){
+            ans = mid;
+            hi = mid-1;
+        }
+        else{
+            lo = mid+1;
         }
     }
-    v2ll p1(n,vll(n)),p2(n,vll(n)),p3(n,vll(n));
-    fr(i,0,n){
-        fr(j,0,n){
-            p1[i][j] = grid[i][j];
-            p2[i][j] = grid[i][j]*i;
-            p3[i][j] = grid[i][j]*j;
-            if(i) {
-                p1[i][j] += p1[i-1][j];
-                p2[i][j] += p2[i-1][j];
-                p3[i][j] += p3[i-1][j];
-            }
-            if(j){
-                p1[i][j] += p1[i][j-1];
-                p2[i][j] += p2[i][j-1];
-                p3[i][j] += p3[i][j-1];
-            }
-            if(i and j){
-                p1[i][j] -= p1[i-1][j-1];
-                p2[i][j] -= p2[i-1][j-1];
-                p3[i][j] -= p3[i-1][j-1];
-            }
-        }
-    }
-    while(q--){
-        ll x1,y1,x2,y2;
-        cin>>x1>>y1>>x2>>y2;
-        x1--,y1--,x2--,y2--;
-        ll col = y2-y1+1;
-
-        ll s1 = p1[x2][y2];
-        if(x1) s1 -= p1[x1-1][y2];
-        if(y1) s1 -= p1[x2][y1-1];
-        if(x1 and y1) s1 += p1[x1-1][y1-1];
-
-        ll s2 = p2[x2][y2];
-        if(x1) s2 -= p2[x1-1][y2];
-        if(y1) s2 -= p2[x2][y1-1];
-        if(x1 and y1) s2 += p2[x1-1][y1-1];
-
-        ll s3 = p3[x2][y2];
-        if(x1) s3 -= p3[x1-1][y2];
-        if(y1) s3 -= p3[x2][y1-1];
-        if(x1 and y1) s3 += p3[x1-1][y1-1];
-
-        ll ans = s3+s2*col-(col*x1+y1-1)*s1;
-        cout<<ans<<" ";
-    }
-    cout<<en;
+    cout<<ans<<en;
 }
 
 signed main(){

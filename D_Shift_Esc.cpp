@@ -69,65 +69,42 @@ inline ll inv(ll a)
     return bin_pow(a,mod-2)%mod;
 }
 
-
+ll dp[201][201][201][2];
 void solve()
 {
-    ll n,q;
-    cin>>n>>q;
-    v2ll grid(n,vll(n));
-    fr(i,0,n){
-        fr(j,0,n){
+    ll n,m,k;
+    cin>>n>>m>>k;
+    v2ll grid(n,vll(m));
+    fr(i,0,n)
+    {
+        fr(j,0,m)
+        {
             cin>>grid[i][j];
-        }
-    }
-    v2ll p1(n,vll(n)),p2(n,vll(n)),p3(n,vll(n));
-    fr(i,0,n){
-        fr(j,0,n){
-            p1[i][j] = grid[i][j];
-            p2[i][j] = grid[i][j]*i;
-            p3[i][j] = grid[i][j]*j;
-            if(i) {
-                p1[i][j] += p1[i-1][j];
-                p2[i][j] += p2[i-1][j];
-                p3[i][j] += p3[i-1][j];
-            }
-            if(j){
-                p1[i][j] += p1[i][j-1];
-                p2[i][j] += p2[i][j-1];
-                p3[i][j] += p3[i][j-1];
-            }
-            if(i and j){
-                p1[i][j] -= p1[i-1][j-1];
-                p2[i][j] -= p2[i-1][j-1];
-                p3[i][j] -= p3[i-1][j-1];
+            fr(rot, 0, m)
+            {
+                fr(f, 0, 2)
+                {
+                    dp[i][j][rot][f] = -1;
+                }
             }
         }
     }
-    while(q--){
-        ll x1,y1,x2,y2;
-        cin>>x1>>y1>>x2>>y2;
-        x1--,y1--,x2--,y2--;
-        ll col = y2-y1+1;
-
-        ll s1 = p1[x2][y2];
-        if(x1) s1 -= p1[x1-1][y2];
-        if(y1) s1 -= p1[x2][y1-1];
-        if(x1 and y1) s1 += p1[x1-1][y1-1];
-
-        ll s2 = p2[x2][y2];
-        if(x1) s2 -= p2[x1-1][y2];
-        if(y1) s2 -= p2[x2][y1-1];
-        if(x1 and y1) s2 += p2[x1-1][y1-1];
-
-        ll s3 = p3[x2][y2];
-        if(x1) s3 -= p3[x1-1][y2];
-        if(y1) s3 -= p3[x2][y1-1];
-        if(x1 and y1) s3 += p3[x1-1][y1-1];
-
-        ll ans = s3+s2*col-(col*x1+y1-1)*s1;
-        cout<<ans<<" ";
-    }
-    cout<<en;
+    auto rec = [&](auto &self,ll i,ll j,ll rot,ll f)->ll{
+        if(rot==m) return INF;
+        if (dp[i][j][rot][f] != -1)
+            return dp[i][j][rot][f];
+        if(!f)
+            return dp[i][j][rot][f] = min(k * rot + self(self, i, j, rot, 1), 
+                                            self(self, i, j, rot + 1, 0));
+        if(i==n-1 and j==m-1) {
+            return grid[i][(j+rot)%m];
+        }
+        ll ans = INF;
+        if(j+1<m) ans = min(ans,self(self,i,j+1,rot,1));
+        if(i+1<n) ans = min(ans,self(self,i+1,j,0,0));
+        return dp[i][j][rot][f] = ans+grid[i][(j+rot)%m];
+    };
+    cout<<rec(rec,0,0,0,0)<<en;
 }
 
 signed main(){

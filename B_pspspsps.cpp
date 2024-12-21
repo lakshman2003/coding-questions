@@ -72,62 +72,46 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll n,q;
-    cin>>n>>q;
-    v2ll grid(n,vll(n));
+    ll n;
+    cin>>n;
+    string s;
+    cin>>s;
+    vll left(n+1,0),right(n+1,n-1);
     fr(i,0,n){
-        fr(j,0,n){
-            cin>>grid[i][j];
+        if(s[i]=='p'){
+            fr(j,1,i+2){
+                right[j]=min(right[j],i);
+            }
         }
-    }
-    v2ll p1(n,vll(n)),p2(n,vll(n)),p3(n,vll(n));
-    fr(i,0,n){
-        fr(j,0,n){
-            p1[i][j] = grid[i][j];
-            p2[i][j] = grid[i][j]*i;
-            p3[i][j] = grid[i][j]*j;
-            if(i) {
-                p1[i][j] += p1[i-1][j];
-                p2[i][j] += p2[i-1][j];
-                p3[i][j] += p3[i-1][j];
-            }
-            if(j){
-                p1[i][j] += p1[i][j-1];
-                p2[i][j] += p2[i][j-1];
-                p3[i][j] += p3[i][j-1];
-            }
-            if(i and j){
-                p1[i][j] -= p1[i-1][j-1];
-                p2[i][j] -= p2[i-1][j-1];
-                p3[i][j] -= p3[i-1][j-1];
+        else if(s[i]=='s'){
+            fr(j,1,n-i+1){
+                left[j]=max(left[j],i);
             }
         }
     }
-    while(q--){
-        ll x1,y1,x2,y2;
-        cin>>x1>>y1>>x2>>y2;
-        x1--,y1--,x2--,y2--;
-        ll col = y2-y1+1;
-
-        ll s1 = p1[x2][y2];
-        if(x1) s1 -= p1[x1-1][y2];
-        if(y1) s1 -= p1[x2][y1-1];
-        if(x1 and y1) s1 += p1[x1-1][y1-1];
-
-        ll s2 = p2[x2][y2];
-        if(x1) s2 -= p2[x1-1][y2];
-        if(y1) s2 -= p2[x2][y1-1];
-        if(x1 and y1) s2 += p2[x1-1][y1-1];
-
-        ll s3 = p3[x2][y2];
-        if(x1) s3 -= p3[x1-1][y2];
-        if(y1) s3 -= p3[x2][y1-1];
-        if(x1 and y1) s3 += p3[x1-1][y1-1];
-
-        ll ans = s3+s2*col-(col*x1+y1-1)*s1;
-        cout<<ans<<" ";
+    priority_queue<pll,vpll,greater<pll>> pq;
+    v2ll start(n);
+    fr(i,1,n+1){
+        if(left[i]>right[i]){
+            no;
+            return;
+        }
+        start[left[i]].pb(i);
     }
-    cout<<en;
+    fr(i,0,n){
+        while(!pq.empty() && pq.top().ff<i){
+            pq.pop();
+        }
+        for(auto x:start[i]){
+            pq.push({right[x],x});
+        }
+        if(pq.empty()){
+            no;
+            return;
+        }
+        pq.pop();
+    }
+    cout<<"YES\n";
 }
 
 signed main(){
