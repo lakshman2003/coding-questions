@@ -72,25 +72,55 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll n,x,y;
-    cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
+    ll n;
+    cin>>n;
+    vll v(n);
+    getv(v,n);
+    vector <vector <pll>> arr(n);
     fr(i,0,n){
-        if(i%2) ans[i] = 1;
-    }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
+        arr[i].pb(MP(v[i],v[i]));
+        if(i) {
+            for(auto [x,y]:arr[i-1]) arr[i].pb(MP(x+v[i],y+v[i]));
+        }
+
+        sort(all(arr[i]));
+        vector <pll> temp;
+        for(auto [x,y]:arr[i]){
+            if(temp.empty()) temp.pb(MP(x,y));
+            else{
+                if(temp.back().ss >= x-1) temp.back().ss = max(temp.back().ss, y);
+                else temp.pb(MP(x,y));
             }
         }
+        arr[i] = temp;
     }
-    print(ans);
+    set <pll> temp;
+    fr(i,0,n){
+        for(auto [x,y]:arr[i]) {
+            auto it = temp.lower_bound(MP(x, 0));
+            while (it != temp.end() && it->ff <= y) {
+                y = max(y, it->ss);
+                x = min(x, it->ff);
+                it = temp.erase(it);
+            }
+            if (it != temp.begin()) {
+                it--;
+                if (it->ss >= x) {
+                    y = max(y, it->ss);
+                    x = min(x, it->ff);
+                    temp.erase(it);
+                }
+            }
+            temp.insert(MP(x, y));
+        }
+    }
+    set <ll> st;
+    st.insert(0);
+    for(auto [x,y]:temp){
+        fr(i,x,y+1) st.insert(i);
+    }
+    cout<<sz(st)<<en;
+    for(auto x:st) cout<<x<<" ";
     cout<<en;
 }
 

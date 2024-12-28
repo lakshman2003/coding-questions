@@ -69,38 +69,37 @@ inline ll inv(ll a)
     return bin_pow(a,mod-2)%mod;
 }
 
-
-void solve()
+class Solution
 {
-    ll n,x,y;
-    cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
-    fr(i,0,n){
-        if(i%2) ans[i] = 1;
-    }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
-            }
-        }
-    }
-    print(ans);
-    cout<<en;
-}
-
-signed main(){
-    fast
-    ll t;
-    cin>>t;
-    while(t--)
+public:
+    bool checkValidCuts(int n, vector<vector<int>> &rectangles)
     {
-        solve();
+        vpll arr;
+        for(auto &v:rectangles){
+            arr.pb(MP(v[1],1));
+            arr.pb(MP(v[3],-1));
+        }
+        sort(all(arr));
+        ll cnt = arr[0].ss;
+        set <ll> st;
+        fr(i,1,sz(arr)){
+            cnt+=arr[i].ss;
+            if(cnt==0) st.insert(arr[i].ff);
+        }
+        if(st.size()>=2) return true;
+        arr.clear();
+        for(auto &v:rectangles){
+            arr.pb(MP(v[0],1));
+            arr.pb(MP(v[2],-1));
+        }
+        sort(all(arr));
+        cnt = arr[0].ss;
+        st.clear();
+        fr(i,1,sz(arr)){
+            cnt+=arr[i].ss;
+            if(cnt==0) st.insert(arr[i].ff);
+        }
+        if(st.size()>=2) return true;
+        return false;
     }
-    return 0;
-}
+};

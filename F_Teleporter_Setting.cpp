@@ -11,10 +11,10 @@ tree_order_statistics_node_update> indexed_set;
 #define ll long long
 #define ldd long double
 #define en '\n'
-#define MP make_pair
 #define pb push_back
 #define pii pair<int, int>
 #define pll pair<ll, ll>
+#define MP make_pair
 #define ff first
 #define ss second
 #define vi vector<int>
@@ -34,8 +34,8 @@ tree_order_statistics_node_update> indexed_set;
 #define mod 1000000007
 #define print(v) fr(i,0,v.size()) cout<<v[i]<<" "
 #define INF LLONG_MAX
-#define yes cout<<"YES\n"
-#define no cout<<"NO\n"
+#define yes cout<<"Yes\n"
+#define no cout<<"No\n"
 #define fast ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
 #define stp(n) cout<<fixed<<setprecision(n)
 #define sz(v) 1LL*v.size()
@@ -72,35 +72,66 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll n,x,y;
-    cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
-    fr(i,0,n){
-        if(i%2) ans[i] = 1;
+    ll n,m;
+    cin>>n>>m;
+    v2ll g(n+1);
+    vll waiting;
+    fr(i,0,m){
+        ll u,v;
+        cin>>u>>v;
+        if(u and v){
+            g[u].pb(v);
+            g[v].pb(u);
+        }
+        else{
+            waiting.pb(u+v);
+        }
     }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
+    sort(all(waiting));
+    vll distn(n+1,1e9),dist1(n+1,1e9);
+    dist1[1] = 0;
+    queue<ll> q;
+    q.push(1);
+    while(!q.empty()){
+        ll u = q.front();
+        q.pop();
+        for(auto v:g[u]){
+            if(dist1[v] > dist1[u] + 1){
+                dist1[v] = dist1[u] + 1;
+                q.push(v);
             }
         }
     }
-    print(ans);
-    cout<<en;
+    distn[n] = 0;
+    q.push(n);
+    while(!q.empty()){
+        ll u = q.front();
+        q.pop();
+        for(auto v:g[u]){
+            if(distn[v] > distn[u] + 1){
+                distn[v] = distn[u] + 1;
+                q.push(v);
+            }
+        }
+    }
+    ll mn1 = 1e9,mnn = 1e9;
+    for(auto x:waiting){
+        mn1 = min(mn1,dist1[x]);
+        mnn = min(mnn,distn[x]);
+    }
+    ll ind = -1;
+    fr(i,1,n+1){
+        ll ans = dist1[n];
+        ll d1 = min(dist1[i],mn1+1);
+        ll d2 = min(distn[i],mnn+1);
+        ans = min(ans,d1+d2);
+        if(ans>m) ans = -1;
+        cout<<ans<<" ";
+    }
 }
 
 signed main(){
     fast
-    ll t;
-    cin>>t;
-    while(t--)
-    {
-        solve();
-    }
+    solve();
     return 0;
 }

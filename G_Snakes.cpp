@@ -72,32 +72,62 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll n,x,y;
-    cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
-    fr(i,0,n){
-        if(i%2) ans[i] = 1;
+    ll n,q;
+    cin>>n>>q;
+    vector <pair<ll,ll>> arr;
+    vll pos(n + 1, 1);
+    fr(i,0,q){
+        ll a;
+        char ch;
+        cin>>a>>ch;
+        if(ch=='-') arr.pb({a,-1});
+        else arr.pb({a,1});
+        if(ch=='+') pos[a]++;
     }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
+    v2ll mp(n+1,vll(n+1,0));
+    fr(i,1,n+1){
+        fr(j,1,n+1){
+            if(i==j) continue;
+            ll l1 = 1,r1 = 1,l2 = 2,r2 = 2,d = 1;
+            for(auto [x,y]:arr){
+                if(x==i){
+                    if(y==1) r1++;
+                    else l1++;
+                }
+                else if(x==j){
+                    if(y==1) r2++;
+                    else l2++;
+                }
+                if(r1>=l2){
+                    d++;
+                    l2++,r2++;
+                }
             }
+            mp[i][j] = d;
         }
     }
-    print(ans);
-    cout<<en;
+    v2ll dp((1<<n)+1,vll(n+1,-1));
+    auto rec = [&](auto &self,ll mask,ll last)->ll{
+        if(mask==0) return pos[last];
+        if(dp[mask][last]!=-1) return dp[mask][last];
+        ll ans = 1e18;
+        fr(i,1,n+1){
+            if(mask&(1<<(i-1))){
+                ans = min(ans,self(self,mask^(1<<(i-1)),i)+mp[last][i]);
+            }
+        }
+        return dp[mask][last] = ans;
+    };
+    ll ans = 1e18;
+    fr(i,1,n+1){
+        ans = min(ans,rec(rec,(1<<n)-1^(1<<(i-1)),i));
+    }
+    cout<<ans<<en;
 }
 
 signed main(){
     fast
-    ll t;
-    cin>>t;
+    ll t =1;
     while(t--)
     {
         solve();

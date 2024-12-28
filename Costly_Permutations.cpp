@@ -72,26 +72,43 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll n,x,y;
-    cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
-    fr(i,0,n){
-        if(i%2) ans[i] = 1;
+    ll n;
+    cin>>n;
+    vll v(n);
+    getv(v,n);
+    fr(i,0,n)
+    {
+        v[i]--;
     }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
+    vll vis(n,0);
+    vll comp;
+    fr(i,0,n)
+    {
+        if(!vis[i])
+        {
+            ll j=i,c = 0;
+            while(!vis[j])
+            {
+                vis[j]=1;
+                j=v[j];
+                c++;
             }
+            comp.pb(c);
         }
     }
-    print(ans);
-    cout<<en;
+    sort(all(comp));
+    ll ans = 0;
+    multiset <ll> s;
+    for(auto x:comp) s.insert(x);
+    while(s.size()>1){
+        ll a = *s.begin();
+        s.erase(s.begin());
+        ll b = *s.begin();
+        s.erase(s.begin());
+        ans+=a+b;
+        s.insert(a+b);
+    }
+    cout<<ans<<en;
 }
 
 signed main(){

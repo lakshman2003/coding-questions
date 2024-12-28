@@ -69,29 +69,22 @@ inline ll inv(ll a)
     return bin_pow(a,mod-2)%mod;
 }
 
-
 void solve()
 {
-    ll n,x,y;
-    cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
-    fr(i,0,n){
-        if(i%2) ans[i] = 1;
+    ll n,k;
+    cin>>n>>k;
+    vll a(n),b(n);
+    getv(a,n);
+    getv(b,n);
+    map <ll,ll> mp;
+    fr(i,0,n) mp[a[i]],mp[b[i]];
+    ll ans = 0;
+    for(auto [x,y]:mp){
+        ll c1 = a.end()-lower_bound(all(a),x);
+        ll c2 = b.end()-lower_bound(all(b),x);
+        if(c2<=k) ans= max(ans,(c1+c2)*x);
     }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
-            }
-        }
-    }
-    print(ans);
-    cout<<en;
+    cout<<ans<<en;
 }
 
 signed main(){

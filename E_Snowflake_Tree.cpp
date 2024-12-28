@@ -11,10 +11,10 @@ tree_order_statistics_node_update> indexed_set;
 #define ll long long
 #define ldd long double
 #define en '\n'
-#define MP make_pair
 #define pb push_back
 #define pii pair<int, int>
 #define pll pair<ll, ll>
+#define MP make_pair
 #define ff first
 #define ss second
 #define vi vector<int>
@@ -34,8 +34,8 @@ tree_order_statistics_node_update> indexed_set;
 #define mod 1000000007
 #define print(v) fr(i,0,v.size()) cout<<v[i]<<" "
 #define INF LLONG_MAX
-#define yes cout<<"YES\n"
-#define no cout<<"NO\n"
+#define yes cout<<"Yes\n"
+#define no cout<<"No\n"
 #define fast ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
 #define stp(n) cout<<fixed<<setprecision(n)
 #define sz(v) 1LL*v.size()
@@ -72,35 +72,58 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll n,x,y;
-    cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
-    fr(i,0,n){
-        if(i%2) ans[i] = 1;
+    ll n;
+    cin>>n;
+    v2ll g(n+1);
+    fr(i,0,n-1){
+        ll u,v;
+        cin>>u>>v;
+        g[u].pb(v);
+        g[v].pb(u);
     }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
-            }
+    vll par(n+1,0),indp(n+1,0);
+    auto dfs = [&](auto &self,ll u,ll p)->void{
+        par[u] = p;
+        indp[u] = 1;
+        for(auto x:g[u]){
+            if(x==p)
+                continue;
+            self(self,x,u);
+            indp[u]+=indp[x];
         }
+    };
+    dfs(dfs,1,0);
+    ll ans = n;
+    fr(i,1,n+1){
+        vpll arr;
+        ll tot = 0;
+        for(auto x:g[i]){
+            ll sz = indp[x],lf = g[x].size()-1;
+            if(par[x]!=i) {
+                sz = n-indp[i];
+            }
+            arr.pb({lf,sz});
+            tot+= sz;
+        }
+        sort(all(arr));
+        ll cnt = arr.size();
+        ll s = 0;
+        ll mini = 1e18;
+        fr(j,0,cnt){
+            ll rem = tot-(cnt-j)*(arr[j].ff+1);
+            rem+= s;
+            if(arr[j].ff) mini = min(mini,rem);
+            s+= arr[j].ss;
+            tot-= arr[j].ss;
+        }
+        ans = min(ans,mini);
     }
-    print(ans);
-    cout<<en;
+    cout<<ans<<en;
+
 }
 
 signed main(){
     fast
-    ll t;
-    cin>>t;
-    while(t--)
-    {
-        solve();
-    }
+    solve();
     return 0;
 }

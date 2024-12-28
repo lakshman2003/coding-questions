@@ -72,32 +72,81 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll n,x,y;
-    cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
-    fr(i,0,n){
-        if(i%2) ans[i] = 1;
+    ll n,q;
+    cin>>n>>q;
+    vll v(n);
+    getv(v,n);
+    v2ll queries(q);
+    fr(i,0,q){
+        ll l,r;
+        cin>>l>>r;
+        l--,r--;
+        queries[i].pb(l);
+        queries[i].pb(r);
+        queries[i].pb(i);
     }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
+    ll block = sqrt(n);
+    sort(all(queries),[&](vll &a,vll &b){
+        if(a[0]/block!=b[0]/block) return a[0]/block<b[0]/block;
+        return a[1]<b[1];
+    });
+    v2ll dp(105,vll(105,0)),dp1(105,vll(105,0));
+    vpll ans(q,{0,0});
+    auto add = [&](ll x){
+        dp[x][1]++;
+        fr(i,0,52){
+            fr(j,1,52){
+                ll val = x^i;
+                if(val>52) cout<<val<<en;
+                dp1[val][j+1]+=dp[i][j];
             }
         }
+    };
+
+    auto remove = [&](ll x){
+        fr(i,0,52){
+            fr_rev(j,52,1){
+                ll val = x^i;
+                (dp[val][j+1] = (dp[val][j+1]-dp[i][j]+mod))%=mod;
+            }
+        }
+    };
+    ll l = 0,r = -1;
+    fr(i,0,q){
+        ll l1 = queries[i][0],r1 = queries[i][1];
+        while(r<r1){
+            r++;
+            add(v[r]);
+        }
+        while(l>l1){
+            l--;
+            add(v[l]);
+        }
+        while(r>r1){
+            remove(v[r]);
+            r--;
+        }
+        while(l<l1){
+            remove(v[l]);
+            l++;
+        }
+        fr(j,0,51){
+            if(dp[0][j]){
+                ans[queries[i][2]] = {r1-l1+1,dp[0][j]};
+                break;
+            }   
+        }
     }
-    print(ans);
-    cout<<en;
+    fr(i,0,q) {
+        if(ans[i].ff==0) cout<<-1<<en;
+        else cout<<ans[i].ff<<" "<<ans[i].ss<<en;
+    }
+
 }
 
 signed main(){
     fast
-    ll t;
-    cin>>t;
+    ll t = 1;
     while(t--)
     {
         solve();

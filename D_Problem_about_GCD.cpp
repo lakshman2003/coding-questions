@@ -72,26 +72,31 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll n,x,y;
-    cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
-    fr(i,0,n){
-        if(i%2) ans[i] = 1;
-    }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
+    ll l,r,g;
+    cin>>l>>r>>g;
+    ll x1 = (l+g-1)/g,x2 = r/g;
+    ll maxi = -1,a = -1,b = -1;
+    fr(i,x1,min(x1+5,x2+1)){
+        ll j = x2;
+        bool f = false;
+        while(j>=x2-5 and j>=i){
+            if(__gcd(i,j)==1){
+                f = true;
+                break;
             }
+            j--;
+        }
+        if(f and j-i>maxi){
+            maxi = j-i;
+            a = i;
+            b = j;
         }
     }
-    print(ans);
-    cout<<en;
+    if(maxi!=-1){
+        a*=g;
+        b*=g;
+    }
+    cout<<a<<" "<<b<<en;
 }
 
 signed main(){

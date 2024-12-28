@@ -72,25 +72,13 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll n,x,y;
-    cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
-    fr(i,0,n){
-        if(i%2) ans[i] = 1;
-    }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
-            }
-        }
-    }
-    print(ans);
+    ll n,d;
+    cin>>n>>d;
+    cout<<1<<" ";
+    if(n>=3 or d%3==0) cout<<3<<" ";
+    if(d==5) cout<<5<<" ";
+    if(d==7 or n>=3) cout<<7<<" ";
+    if(d==9 or (d%3==0 and n>=3) or (n>=6)) cout<<9<<" ";
     cout<<en;
 }
 

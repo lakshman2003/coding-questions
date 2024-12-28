@@ -72,26 +72,31 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll n,x,y;
-    cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
-    fr(i,0,n){
-        if(i%2) ans[i] = 1;
-    }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
+    ll n,m,k;
+    cin>>n>>m>>k;
+    vll a(m);
+    getv(a,m);
+    vll q(k);
+    getv(q,k);
+    string ans = "";
+    fr(i,0,m) ans+= '0';
+    if(k==n) fr(i,0,m) ans[i] = '1';
+    else if(k==n-1){
+        ll not_there = n;
+        fr(i,0,k) {
+            if(q[i]!=i+1){
+                not_there = i+1;
+                break;
+            }
+        }
+        fr(i,0,m){
+            if(a[i]==not_there){
+                ans[i] = '1';
+                break;
             }
         }
     }
-    print(ans);
-    cout<<en;
+    cout<<ans<<en;
 }
 
 signed main(){

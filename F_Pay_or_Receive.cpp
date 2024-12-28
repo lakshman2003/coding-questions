@@ -11,10 +11,10 @@ tree_order_statistics_node_update> indexed_set;
 #define ll long long
 #define ldd long double
 #define en '\n'
-#define MP make_pair
 #define pb push_back
 #define pii pair<int, int>
 #define pll pair<ll, ll>
+#define MP make_pair
 #define ff first
 #define ss second
 #define vi vector<int>
@@ -34,8 +34,8 @@ tree_order_statistics_node_update> indexed_set;
 #define mod 1000000007
 #define print(v) fr(i,0,v.size()) cout<<v[i]<<" "
 #define INF LLONG_MAX
-#define yes cout<<"YES\n"
-#define no cout<<"NO\n"
+#define yes cout<<"Yes\n"
+#define no cout<<"No\n"
 #define fast ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
 #define stp(n) cout<<fixed<<setprecision(n)
 #define sz(v) 1LL*v.size()
@@ -72,35 +72,71 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll n,x,y;
-    cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
-    fr(i,0,n){
-        if(i%2) ans[i] = 1;
+    ll n,m,q;
+    cin>>n>>m>>q;
+    vector <vector <pair<ll,ll>>> g(n+1);
+    fr(i,0,m){
+        ll a,b,c;
+        cin>>a>>b>>c;
+        g[a].pb(MP(b,c));
+        g[b].pb(MP(a,-c));
     }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
-            }
+    vll comp(n+1,-1),pos_cycle(n+1,0),vis(n+1,0),dist(n+1,0);
+    auto dfs = [&](auto &self,ll node,ll p,ll c,ll w){
+        comp[node] = c;
+        if(vis[node]==1){
+            if(w!=dist[node])
+                pos_cycle[c] = 1;
+            return;
+        }
+        if(vis[node]==2) return;
+        vis[node] = 1;
+        dist[node] = w;
+        for(auto [nei,wei]:g[node]){
+            self(self,nei,node,c,w+wei);
+        }
+        vis[node] = 2;
+    };
+    ll col = 0;
+    fr(i,1,n+1){
+        if(!vis[i]){
+            col++;
+            dfs(dfs,i,0,col,0);
         }
     }
-    print(ans);
-    cout<<en;
+
+    vis.resize(n+1,0);
+    auto dfs2 = [&](auto &self,ll node,ll p,ll w,ll d)->void{
+        dist[node] = w;
+        vis[node] = 1;
+        for(auto [nei,wei]:g[node]){
+            if(vis[nei] or nei==p) continue;
+            self(self,nei,node,w+wei,d+1);
+        }
+    };
+
+    vll done(col+2,0);
+    fr(i,1,n+1){
+        if(!pos_cycle[comp[i]] and !done[comp[i]]){
+            dfs2(dfs2,i,0,0,0);
+            done[comp[i]] = 1;
+        }
+    }
+
+    while(q--){
+        ll a,b;
+        cin>>a>>b;
+        if(comp[a]!=comp[b]) cout<<"nan"<<en;
+        else if(pos_cycle[comp[a]]) cout<<"inf"<<en;
+        else{
+            ll ans = dist[b]-dist[a];
+            cout<<ans<<en;
+        }
+    }
 }
 
 signed main(){
     fast
-    ll t;
-    cin>>t;
-    while(t--)
-    {
-        solve();
-    }
+    solve();
     return 0;
 }

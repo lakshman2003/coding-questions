@@ -11,10 +11,10 @@ tree_order_statistics_node_update> indexed_set;
 #define ll long long
 #define ldd long double
 #define en '\n'
-#define MP make_pair
 #define pb push_back
 #define pii pair<int, int>
 #define pll pair<ll, ll>
+#define MP make_pair
 #define ff first
 #define ss second
 #define vi vector<int>
@@ -34,8 +34,8 @@ tree_order_statistics_node_update> indexed_set;
 #define mod 1000000007
 #define print(v) fr(i,0,v.size()) cout<<v[i]<<" "
 #define INF LLONG_MAX
-#define yes cout<<"YES\n"
-#define no cout<<"NO\n"
+#define yes cout<<"Yes\n"
+#define no cout<<"No\n"
 #define fast ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
 #define stp(n) cout<<fixed<<setprecision(n)
 #define sz(v) 1LL*v.size()
@@ -72,35 +72,43 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll n,x,y;
-    cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
-    fr(i,0,n){
-        if(i%2) ans[i] = 1;
-    }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
-            }
+    ll n,m,x,y;
+    cin>>n>>m>>x>>y;
+    x--;y--;
+    vector<string> v(n);
+    fr(i,0,n)
+        cin>>v[i];
+    string t;
+    cin>>t;
+    set <pll> st;
+    ll currx = x, curry = y;
+    if(v[currx][curry]=='@')
+        st.insert({currx,curry});
+    for(auto c:t){
+        if(c=='U'){
+            if(currx-1>=0 and v[currx-1][curry]!='#')
+                currx--;
         }
+        else if(c=='D'){
+            if(currx+1<n and v[currx+1][curry]!='#')
+                currx++;
+        }
+        else if(c=='L'){
+            if(curry-1>=0 and v[currx][curry-1]!='#')
+                curry--;
+        }
+        else{
+            if(curry+1<m and v[currx][curry+1]!='#')
+                curry++;
+        }
+        if(v[currx][curry]=='@')
+            st.insert({currx,curry});
     }
-    print(ans);
-    cout<<en;
+    cout<<currx+1<<" "<<curry+1<<" "<<sz(st)<<en;
 }
 
 signed main(){
     fast
-    ll t;
-    cin>>t;
-    while(t--)
-    {
-        solve();
-    }
+    solve();
     return 0;
 }

@@ -74,24 +74,18 @@ void solve()
 {
     ll n,x,y;
     cin>>n>>x>>y;
-    x--,y--;
-    vll ans(n,0);
+    vll v(n);
+    getv(v,n);
+    sort(all(v));
+    ll s = accumulate(all(v),0LL);
+    ll ans = 0;
     fr(i,0,n){
-        if(i%2) ans[i] = 1;
+        ll l = s-y-v[i],r = s-x-v[i];
+        auto it = lower_bound(v.begin()+i+1,v.end(),l);
+        auto it2 = upper_bound(v.begin()+i+1,v.end(),r);
+        ans+= (it2-it);
     }
-    if(n%2) ans[n-1] = 2;
-    if(ans[x]==ans[y]){
-        if(n%2==0 or x!=0) ans[x] = 2;
-        else {
-            ans[y]= 2;
-            if(y+1==n-2) {
-                ans[y+1] = 0;
-                ans[y+2] = 1;
-            }
-        }
-    }
-    print(ans);
-    cout<<en;
+    cout<<ans<<en;
 }
 
 signed main(){
