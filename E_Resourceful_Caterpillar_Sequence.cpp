@@ -72,49 +72,54 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll x, k;
-    cin >> x >> k;
-    v2ll arr(k);
-    fr(i, 0, k) {
-        ll n;
-        cin >> n;
-        arr[i].resize(n);
-        fr(j, 0, n) cin >> arr[i][j];
+    ll n;
+    cin >> n;
+    v2ll g(n + 1);
+    fr(i, 0, n - 1) {
+        ll u, v;
+        cin >> u >> v;
+        g[u].pb(v);
+        g[v].pb(u);
     }
-    multiset<vll> mt;
-    vll pos(k + 1, -1);
-    auto inc = [&](auto &v, ll ind) -> vll {
-        ll sc = 0, maxi = 0;
-        while (sc <= 0 && ind + 1 < v.size()) {
-            sc += v[ind + 1];
-            maxi = max(maxi, -sc);
-            ind++;
+    ll ans = 0, leaves = 0;
+    fr_e(i, 1, n) if (sz(g[i]) == 1) leaves++;
+    ans = leaves * (n - leaves);
+    vll par(n + 1), indp(n + 1);
+    function<void(ll, ll)> dfs = [&](ll node, ll p) {
+        par[node] = p;
+        indp[node] = 0;
+        bool ok = true;
+        for (auto x : g[node]) {
+            if (g[x].size() == 1) ok = false;
+            if (x == p) continue;
+            dfs(x, node);
+            indp[node] += indp[x];
         }
-        return sc > 0 ? vll{maxi, sc, ind} : vll{-1, -1, -1};
+        if (ok && g[node].size() > 1) indp[node]++;
     };
-    fr(i, 0, k) {
-        vll v = inc(arr[i], -1);
-        if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-        pos[i] = v[2];
+    dfs(1, 0);
+    ll tp = indp[1];
+    fr(i, 1, n + 1) {
+        if (g[i].size() == 1) continue;
+        bool ok = false;
+        for (auto x : g[i]) if (g[x].size() == 1) ok = true;
+        if (ok) {
+            for (auto x : g[i]) {
+                if (g[x].size() != 1) {
+                    ll poss = tp - indp[x];
+                    if (x == par[i]) poss = indp[i];
+                    ans += poss;
+                }
+            }
+        }
     }
-    ll curr = x;
-    while (!mt.empty()) {
-        auto x = *mt.begin();
-        mt.erase(mt.begin());
-        ll maxi = x[0], sc = x[1], ind = x[2], i = x[3];
-        if (curr >= maxi) {
-            curr += sc;
-            vll v = inc(arr[i], ind);
-            if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-            pos[i] = v[2];
-        } else break;
-    }
-    cout << curr << en;
+    cout << ans << en;
 }
 
 signed main(){
     fast
-    ll t = 1;
+    ll t;
+    cin>>t;
     while(t--)
     {
         solve();

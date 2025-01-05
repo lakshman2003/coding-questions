@@ -11,10 +11,10 @@ tree_order_statistics_node_update> indexed_set;
 #define ll long long
 #define ldd long double
 #define en '\n'
-#define MP make_pair
 #define pb push_back
 #define pii pair<int, int>
 #define pll pair<ll, ll>
+#define MP make_pair
 #define ff first
 #define ss second
 #define vi vector<int>
@@ -34,8 +34,8 @@ tree_order_statistics_node_update> indexed_set;
 #define mod 1000000007
 #define print(v) fr(i,0,v.size()) cout<<v[i]<<" "
 #define INF LLONG_MAX
-#define yes cout<<"YES\n"
-#define no cout<<"NO\n"
+#define yes cout<<"Yes\n"
+#define no cout<<"No\n"
 #define fast ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
 #define stp(n) cout<<fixed<<setprecision(n)
 #define sz(v) 1LL*v.size()
@@ -72,52 +72,19 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll x, k;
-    cin >> x >> k;
-    v2ll arr(k);
-    fr(i, 0, k) {
-        ll n;
-        cin >> n;
-        arr[i].resize(n);
-        fr(j, 0, n) cin >> arr[i][j];
+    string s;
+    cin>>s;
+    ll n = s.length();
+    vll dp(n+1,0);
+    fr(i,1,n+1){
+        dp[i] = dp[i-1]+1;
+        if(i>=2 and s[i-1]=='0' and s[i-2]=='0') dp[i] = min(dp[i],dp[i-2]+1);
     }
-    multiset<vll> mt;
-    vll pos(k + 1, -1);
-    auto inc = [&](auto &v, ll ind) -> vll {
-        ll sc = 0, maxi = 0;
-        while (sc <= 0 && ind + 1 < v.size()) {
-            sc += v[ind + 1];
-            maxi = max(maxi, -sc);
-            ind++;
-        }
-        return sc > 0 ? vll{maxi, sc, ind} : vll{-1, -1, -1};
-    };
-    fr(i, 0, k) {
-        vll v = inc(arr[i], -1);
-        if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-        pos[i] = v[2];
-    }
-    ll curr = x;
-    while (!mt.empty()) {
-        auto x = *mt.begin();
-        mt.erase(mt.begin());
-        ll maxi = x[0], sc = x[1], ind = x[2], i = x[3];
-        if (curr >= maxi) {
-            curr += sc;
-            vll v = inc(arr[i], ind);
-            if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-            pos[i] = v[2];
-        } else break;
-    }
-    cout << curr << en;
+    cout<<dp[n]<<en;
 }
 
 signed main(){
     fast
-    ll t = 1;
-    while(t--)
-    {
-        solve();
-    }
+    solve();
     return 0;
 }

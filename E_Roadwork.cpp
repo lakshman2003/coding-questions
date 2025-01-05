@@ -72,49 +72,38 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll x, k;
-    cin >> x >> k;
-    v2ll arr(k);
-    fr(i, 0, k) {
-        ll n;
-        cin >> n;
-        arr[i].resize(n);
-        fr(j, 0, n) cin >> arr[i][j];
+    ll n,q;
+    cin>>n>>q;
+    v2ll arr;
+    fr(i,0,n){
+        ll s,t,x;
+        cin>>s>>t>>x;
+        arr.pb({s,t,x});
     }
-    multiset<vll> mt;
-    vll pos(k + 1, -1);
-    auto inc = [&](auto &v, ll ind) -> vll {
-        ll sc = 0, maxi = 0;
-        while (sc <= 0 && ind + 1 < v.size()) {
-            sc += v[ind + 1];
-            maxi = max(maxi, -sc);
+    vll queries(q);
+    getv(queries,q);
+    vpll t;
+    for(auto &a:arr){
+        t.pb(MP(a[0]-a[2],a[2]));
+        t.pb(MP(a[1]-a[2],-a[2]));
+    }
+    sort(all(t));
+    ll ind = -1;
+    multiset <ll> mt;
+    fr(i,0,q){
+        while(ind+1<t.size() and t[ind+1].ff<=queries[i]){
             ind++;
+            if(t[ind].ss>0) mt.insert(t[ind].ss);
+            else mt.erase(mt.find(-t[ind].ss));
         }
-        return sc > 0 ? vll{maxi, sc, ind} : vll{-1, -1, -1};
-    };
-    fr(i, 0, k) {
-        vll v = inc(arr[i], -1);
-        if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-        pos[i] = v[2];
+        if(mt.empty()) cout<<-1<<en;
+        else cout<<*mt.begin()<<en;
     }
-    ll curr = x;
-    while (!mt.empty()) {
-        auto x = *mt.begin();
-        mt.erase(mt.begin());
-        ll maxi = x[0], sc = x[1], ind = x[2], i = x[3];
-        if (curr >= maxi) {
-            curr += sc;
-            vll v = inc(arr[i], ind);
-            if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-            pos[i] = v[2];
-        } else break;
-    }
-    cout << curr << en;
 }
 
 signed main(){
     fast
-    ll t = 1;
+    ll t =1;
     while(t--)
     {
         solve();

@@ -11,10 +11,10 @@ tree_order_statistics_node_update> indexed_set;
 #define ll long long
 #define ldd long double
 #define en '\n'
-#define MP make_pair
 #define pb push_back
 #define pii pair<int, int>
 #define pll pair<ll, ll>
+#define MP make_pair
 #define ff first
 #define ss second
 #define vi vector<int>
@@ -34,8 +34,8 @@ tree_order_statistics_node_update> indexed_set;
 #define mod 1000000007
 #define print(v) fr(i,0,v.size()) cout<<v[i]<<" "
 #define INF LLONG_MAX
-#define yes cout<<"YES\n"
-#define no cout<<"NO\n"
+#define yes cout<<"Yes\n"
+#define no cout<<"No\n"
 #define fast ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
 #define stp(n) cout<<fixed<<setprecision(n)
 #define sz(v) 1LL*v.size()
@@ -69,55 +69,67 @@ inline ll inv(ll a)
     return bin_pow(a,mod-2)%mod;
 }
 
-
+ll dist[1005][1005][2];
 void solve()
 {
-    ll x, k;
-    cin >> x >> k;
-    v2ll arr(k);
-    fr(i, 0, k) {
-        ll n;
-        cin >> n;
-        arr[i].resize(n);
-        fr(j, 0, n) cin >> arr[i][j];
-    }
-    multiset<vll> mt;
-    vll pos(k + 1, -1);
-    auto inc = [&](auto &v, ll ind) -> vll {
-        ll sc = 0, maxi = 0;
-        while (sc <= 0 && ind + 1 < v.size()) {
-            sc += v[ind + 1];
-            maxi = max(maxi, -sc);
-            ind++;
+    ll h,w;
+    cin>>h>>w;
+    vector <string> grid(h);
+    fr(i,0,h) cin>>grid[i];
+    ll xs,ys,xg,yg;
+    fr(i,0,h){
+        fr(j,0,w){
+            if(grid[i][j]=='S') xs = i, ys = j;
+            if(grid[i][j]=='G') xg = i, yg = j;
         }
-        return sc > 0 ? vll{maxi, sc, ind} : vll{-1, -1, -1};
+    }
+    queue <vll> q;
+    auto check = [&](ll x, ll y){
+        if(x>=0 && x<h && y>=0 && y<w and grid[x][y]!='#') return 1;
+        return 0;
     };
-    fr(i, 0, k) {
-        vll v = inc(arr[i], -1);
-        if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-        pos[i] = v[2];
+    fr(i,0,h){
+        fr(j,0,w){
+            dist[i][j][0] = dist[i][j][1] = INF;
+        }
     }
-    ll curr = x;
-    while (!mt.empty()) {
-        auto x = *mt.begin();
-        mt.erase(mt.begin());
-        ll maxi = x[0], sc = x[1], ind = x[2], i = x[3];
-        if (curr >= maxi) {
-            curr += sc;
-            vll v = inc(arr[i], ind);
-            if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-            pos[i] = v[2];
-        } else break;
+    dist[xs][ys][0] = 0;
+    dist[xs][ys][1] = 0;
+    ll dx[]= {0,0,1,-1};
+    ll dy[]= {1,-1,0,0};
+    q.push({xs,ys,0});
+    q.push({xs,ys,1});
+    while(!q.empty()){
+        vll cur = q.front();
+        q.pop();
+        ll x = cur[0], y = cur[1], z = cur[2];
+        if(z==0){
+            fr(i,0,2){
+                ll nx = x+dx[i], ny = y+dy[i];
+                if(check(nx,ny) and dist[nx][ny][z^1]>dist[x][y][z]+1){
+                    dist[nx][ny][z^1] = dist[x][y][z]+1;
+                    q.push({nx,ny,z^1});
+                }
+            }
+        }
+        else{
+            fr(i,2,4){
+                ll nx = x+dx[i], ny = y+dy[i];
+                if(check(nx,ny) and dist[nx][ny][z^1]>dist[x][y][z]+1){
+                    dist[nx][ny][z^1] = dist[x][y][z]+1;
+                    q.push({nx,ny,z^1});
+                }
+            }
+        }
     }
-    cout << curr << en;
+    ll ans = min(dist[xg][yg][0],dist[xg][yg][1]);
+    if(ans==INF) cout<<-1<<en;
+    else cout<<ans<<en;
+
 }
 
 signed main(){
     fast
-    ll t = 1;
-    while(t--)
-    {
-        solve();
-    }
+    solve();
     return 0;
 }

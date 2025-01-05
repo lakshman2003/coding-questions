@@ -69,52 +69,40 @@ inline ll inv(ll a)
     return bin_pow(a,mod-2)%mod;
 }
 
-
+#define int long long
 void solve()
 {
-    ll x, k;
-    cin >> x >> k;
-    v2ll arr(k);
-    fr(i, 0, k) {
-        ll n;
-        cin >> n;
-        arr[i].resize(n);
-        fr(j, 0, n) cin >> arr[i][j];
-    }
-    multiset<vll> mt;
-    vll pos(k + 1, -1);
-    auto inc = [&](auto &v, ll ind) -> vll {
-        ll sc = 0, maxi = 0;
-        while (sc <= 0 && ind + 1 < v.size()) {
-            sc += v[ind + 1];
-            maxi = max(maxi, -sc);
-            ind++;
+    int n;
+    cin>>n;
+    vector <int> a(n),b(n);
+    for(int i = 0;i<n;i++) cin>>a[i];
+    for(int i = 0;i<n;i++) cin>>b[i];
+    auto check = [&](int x){
+        int r = x;
+        for(int i = 0;i<n;i++){
+            r = max(r,min(r,a[i])+b[i]);
+            r--;
+            if(r<0) return false;
         }
-        return sc > 0 ? vll{maxi, sc, ind} : vll{-1, -1, -1};
+        return true;
     };
-    fr(i, 0, k) {
-        vll v = inc(arr[i], -1);
-        if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-        pos[i] = v[2];
+    int lo = 0,hi = 1e9;
+    int ans = hi;
+    while(lo<=hi){
+        int mid= (lo+hi)/2;
+        if(check(mid)){
+            ans = mid;
+            hi = mid-1;
+        }
+        else lo = mid+1;
     }
-    ll curr = x;
-    while (!mt.empty()) {
-        auto x = *mt.begin();
-        mt.erase(mt.begin());
-        ll maxi = x[0], sc = x[1], ind = x[2], i = x[3];
-        if (curr >= maxi) {
-            curr += sc;
-            vll v = inc(arr[i], ind);
-            if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-            pos[i] = v[2];
-        } else break;
-    }
-    cout << curr << en;
+    cout<<ans<<en;
 }
 
 signed main(){
     fast
-    ll t = 1;
+    ll t;
+    cin>>t;
     while(t--)
     {
         solve();

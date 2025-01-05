@@ -69,55 +69,41 @@ inline ll inv(ll a)
     return bin_pow(a,mod-2)%mod;
 }
 
-
-void solve()
+class Solution
 {
-    ll x, k;
-    cin >> x >> k;
-    v2ll arr(k);
-    fr(i, 0, k) {
-        ll n;
-        cin >> n;
-        arr[i].resize(n);
-        fr(j, 0, n) cin >> arr[i][j];
-    }
-    multiset<vll> mt;
-    vll pos(k + 1, -1);
-    auto inc = [&](auto &v, ll ind) -> vll {
-        ll sc = 0, maxi = 0;
-        while (sc <= 0 && ind + 1 < v.size()) {
-            sc += v[ind + 1];
-            maxi = max(maxi, -sc);
-            ind++;
-        }
-        return sc > 0 ? vll{maxi, sc, ind} : vll{-1, -1, -1};
-    };
-    fr(i, 0, k) {
-        vll v = inc(arr[i], -1);
-        if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-        pos[i] = v[2];
-    }
-    ll curr = x;
-    while (!mt.empty()) {
-        auto x = *mt.begin();
-        mt.erase(mt.begin());
-        ll maxi = x[0], sc = x[1], ind = x[2], i = x[3];
-        if (curr >= maxi) {
-            curr += sc;
-            vll v = inc(arr[i], ind);
-            if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-            pos[i] = v[2];
-        } else break;
-    }
-    cout << curr << en;
-}
-
-signed main(){
-    fast
-    ll t = 1;
-    while(t--)
+public:
+    #define MP make_pair
+    vector<int> maxSumOfThreeSubarrays(vector<int> &nums, int k)
     {
-        solve();
+        int n = nums.size();
+        multiset<pair<int, int>, vector<pair<int, int>>,
+                 greater<pair<int, int>>>mt1, mt2;
+        vector<int> pre(n);
+        pre[0] = nums[0];
+        for (int i = 1; i < n; i++)
+        {
+            pre[i] = pre[i - 1] + nums[i];
+        }
+        mt1.insert(MP(pre[k - 1], 0));
+        for (int i = 2 * k; i <= n - k; i++)
+        {
+            mt2.insert(MP(pre[i + k - 1] - pre[i - 1], i - k));
+        }
+        int maxi = 0;
+        vector<int> ans = {n + 1, n + 1, n + 1};
+        for (int i = k; i <= n - 2 * k; i++)
+        {
+            int s = pre[i + k - 1] - pre[i - 1];
+            auto [s1, l1] = *mt1.begin();
+            auto [s2, l2] = *mt2.begin();
+            if (s + s1 + s2 >= maxi)
+            {
+                ans = min(ans, {l1, i, l2});
+                maxi = s + s1 + s2;
+            }
+            mt1.insert(MP(pre[i] - pre[i - k], -(i - k + 1)));
+            mt2.erase(mt2.find(MP(pre[i + 2 * k - 1] - pre[i + k - 1], -(i + k))));
+        }
+        return ans;
     }
-    return 0;
-}
+};

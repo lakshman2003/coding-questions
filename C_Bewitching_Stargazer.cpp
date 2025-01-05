@@ -72,49 +72,33 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll x, k;
-    cin >> x >> k;
-    v2ll arr(k);
-    fr(i, 0, k) {
-        ll n;
-        cin >> n;
-        arr[i].resize(n);
-        fr(j, 0, n) cin >> arr[i][j];
-    }
-    multiset<vll> mt;
-    vll pos(k + 1, -1);
-    auto inc = [&](auto &v, ll ind) -> vll {
-        ll sc = 0, maxi = 0;
-        while (sc <= 0 && ind + 1 < v.size()) {
-            sc += v[ind + 1];
-            maxi = max(maxi, -sc);
-            ind++;
+    ll n,k;
+    cin>>n>>k;
+    function<pll(ll, ll)> rec = [&](ll l, ll r) -> pll {
+        if (l > r) return MP(0, 0);
+        ll len = r - l + 1;
+        if (len < k) return MP(0, 0);
+        ll mid = (l + r) / 2;
+        ll ans = 0, cnt = 0;
+        if (len % 2) {
+            ans += mid;
+            cnt++;
         }
-        return sc > 0 ? vll{maxi, sc, ind} : vll{-1, -1, -1};
+        pll t;
+        if (len % 2) t = rec(l, mid - 1);
+        else t = rec(l, mid);
+        ans += 2 * t.ff + t.ss * (mid + 1 - l);
+        cnt += 2 * t.ss;
+        return MP(ans, cnt);
     };
-    fr(i, 0, k) {
-        vll v = inc(arr[i], -1);
-        if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-        pos[i] = v[2];
-    }
-    ll curr = x;
-    while (!mt.empty()) {
-        auto x = *mt.begin();
-        mt.erase(mt.begin());
-        ll maxi = x[0], sc = x[1], ind = x[2], i = x[3];
-        if (curr >= maxi) {
-            curr += sc;
-            vll v = inc(arr[i], ind);
-            if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-            pos[i] = v[2];
-        } else break;
-    }
-    cout << curr << en;
+    pll ans = rec(1,n);
+    cout<<ans.ff<<en;
 }
 
 signed main(){
     fast
-    ll t = 1;
+    ll t;
+    cin>>t;
     while(t--)
     {
         solve();

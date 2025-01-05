@@ -11,10 +11,10 @@ tree_order_statistics_node_update> indexed_set;
 #define ll long long
 #define ldd long double
 #define en '\n'
-#define MP make_pair
 #define pb push_back
 #define pii pair<int, int>
 #define pll pair<ll, ll>
+#define MP make_pair
 #define ff first
 #define ss second
 #define vi vector<int>
@@ -34,8 +34,8 @@ tree_order_statistics_node_update> indexed_set;
 #define mod 1000000007
 #define print(v) fr(i,0,v.size()) cout<<v[i]<<" "
 #define INF LLONG_MAX
-#define yes cout<<"YES\n"
-#define no cout<<"NO\n"
+#define yes cout<<"Yes\n"
+#define no cout<<"No\n"
 #define fast ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
 #define stp(n) cout<<fixed<<setprecision(n)
 #define sz(v) 1LL*v.size()
@@ -72,52 +72,63 @@ inline ll inv(ll a)
 
 void solve()
 {
-    ll x, k;
-    cin >> x >> k;
-    v2ll arr(k);
-    fr(i, 0, k) {
-        ll n;
-        cin >> n;
-        arr[i].resize(n);
-        fr(j, 0, n) cin >> arr[i][j];
-    }
-    multiset<vll> mt;
-    vll pos(k + 1, -1);
-    auto inc = [&](auto &v, ll ind) -> vll {
-        ll sc = 0, maxi = 0;
-        while (sc <= 0 && ind + 1 < v.size()) {
-            sc += v[ind + 1];
-            maxi = max(maxi, -sc);
-            ind++;
+    ll k;
+    cin>>k;
+    string s,t;
+    cin>>s>>t;
+    ll n1 = s.length(),n2 = t.length();
+    if(s==t) yes;
+    else if(abs(n1-n2)>1) no;
+    else if(n1<n2){
+        ll i = 0,j = 0,rem = k;
+        while(i<n1 and j<n2 and s[i]==t[j]){
+            i++;
+            j++;
         }
-        return sc > 0 ? vll{maxi, sc, ind} : vll{-1, -1, -1};
-    };
-    fr(i, 0, k) {
-        vll v = inc(arr[i], -1);
-        if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-        pos[i] = v[2];
+        rem--;
+        j++;
+        while(i<n1 and j<n2 and s[i]==t[j]){
+            i++;
+            j++;
+        }
+        if(i==n1 and j==n2 and rem>=0) yes;
+        else no;
     }
-    ll curr = x;
-    while (!mt.empty()) {
-        auto x = *mt.begin();
-        mt.erase(mt.begin());
-        ll maxi = x[0], sc = x[1], ind = x[2], i = x[3];
-        if (curr >= maxi) {
-            curr += sc;
-            vll v = inc(arr[i], ind);
-            if (v[1] > 0) mt.insert({v[0], v[1], v[2], i});
-            pos[i] = v[2];
-        } else break;
+    else if(n1>n2){
+        ll i = 0,j = 0,rem = k;
+        while(i<n1 and j<n2 and s[i]==t[j]){
+            i++;
+            j++;
+        }
+        rem--;
+        i++;
+        while(i<n1 and j<n2 and s[i]==t[j]){
+            i++;
+            j++;
+        }
+        if(i==n1 and j==n2 and rem>=0) yes;
+        else no;
     }
-    cout << curr << en;
+    else{
+        ll i = 0,j = 0;
+        while(i<n1 and j<n2 and s[i]==t[j]){
+            i++;
+            j++;
+        }
+        fr(ind,i,n1){
+            if(s[ind]==s[i]) s[ind]=t[j];
+        }
+        while(i<n1 and j<n2 and s[i]==t[j]){
+            i++;
+            j++;
+        }
+        if(i==n1 and j==n2) yes;
+        else no;
+    }
 }
 
 signed main(){
     fast
-    ll t = 1;
-    while(t--)
-    {
-        solve();
-    }
+    solve();
     return 0;
 }
